@@ -1,0 +1,193 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum landTitleStatus {
+  OCCUPE
+  DISPONIBLE
+}
+
+model User {
+  id        String       @id @default(uuid())
+  firstname String
+  lastname  String
+  email     String
+  cni       String
+  city      String
+  address   String?
+  phone     String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  landTitle landTitle[]
+  banks     UserOnBank[]
+
+  @@unique([email, cni, phone])
+  @@map("user")
+}
+
+model Bank {
+  id         String       @id @default(uuid())
+  name       String
+  city       String
+  locality   String
+  email      String
+  hash       String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  landTitle  landTitle[]
+  users      UserOnBank[]
+  BankOnLand LandOnBank[]
+
+  @@unique([name, email])
+  @@map("bank")
+}
+
+model landTitle {
+  id         String          @id @default(uuid())
+  number     Int
+  department String
+  vol        Int
+  folio      Int
+  status     landTitleStatus @default(DISPONIBLE)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  userId     String
+  user       User            @relation(fields: [userId], references: [id])
+  bankId     String
+  bank       Bank            @relation(fields: [bankId], references: [id])
+  BankOnLand LandOnBank[]
+
+  @@unique([number, vol, folio])
+  @@map("land_title")
+}
+
+model UserOnBank {
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  bankId String
+  bank   Bank   @relation(fields: [bankId], references: [id])
+
+  @@unique([userId, bankId])
+  @@map("user_bank")
+}
+
+model LandOnBank {
+  landId String
+  land   landTitle @relation(fields: [landId], references: [id])
+  bankId String
+  bank   Bank      @relation(fields: [bankId], references: [id])
+
+  @@unique([bankId, landId])
+  @@map("land_bank")
+}
+
+
+
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum landTitleStatus {
+  OCCUPE
+  DISPONIBLE
+}
+
+model User {
+  id        String       @id @default(uuid())
+  firstname String
+  lastname  String
+  email     String
+  cni       String
+  city      String
+  address   String?
+  phone     String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  landTitle landTitle[]
+  banks     UserOnBank[]
+
+  @@unique([email, cni, phone])
+  @@map("user")
+}
+
+model Bank {
+  id         String       @id @default(uuid())
+  name       String
+  city       String
+  locality   String
+  email      String
+  hash       String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  landTitle  landTitle[]
+  users      UserOnBank[]
+  BankOnLand LandOnBank[]
+
+  @@unique([name, email])
+  @@map("bank")
+}
+
+model landTitle {
+  id         String          @id @default(uuid())
+  number     Int
+  department String
+  vol        Int
+  folio      Int
+  status     landTitleStatus @default(DISPONIBLE)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  userId     String
+  user       User            @relation(fields: [userId], references: [id])
+  bankId     String
+  bank       Bank            @relation(fields: [bankId], references: [id])
+  BankOnLand LandOnBank[]
+
+  @@unique([number, vol, folio])
+  @@map("land_title")
+}
+
+model UserOnBank {
+  id     String @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  bankId String
+  bank   Bank   @relation(fields: [bankId], references: [id])
+
+  // @@id([userId, bankId])
+  @@map("user_bank")
+}
+
+model LandOnBank {
+  id     String    @default(uuid())
+  landId String
+  land   landTitle @relation(fields: [landId], references: [id])
+  bankId String
+  bank   Bank      @relation(fields: [bankId], references: [id])
+
+  // @@id([landId, bankId])
+  @@map("land_bank")
+}
+
+
+
+
+DATABASE_URL="mysql://root:@localhost:3306/secutif-v2"
+PORT=3003
+JWT="SECUTIF"

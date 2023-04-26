@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum landTitleStatus {
+  OCCUPE
+  DISPONIBLE
+}
+
+model Client {
+  id        String      @id @default(uuid())
+  firstname String
+  lastname  String
+  email     String      @unique
+  cni       String      @unique
+  city      String
+  address   String?
+  phone     String      @unique
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  landTitle landTitle[]
+  Loans     Loans[]
+
+  @@map("user")
+}
+
+model Bank {
+  id        String      @id @default(uuid())
+  name      String      @unique
+  city      String
+  locality  String
+  email     String      @unique
+  password  String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  lands     landTitle[]
+  Loans     Loans[]
+
+  @@map("bank")
+}
+
+model landTitle {
+  id         String          @id @default(uuid())
+  number     Int             @unique
+  department String
+  vol        Int             @unique
+  folio      Int             @unique
+  status     landTitleStatus @default(DISPONIBLE)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  clientId   String
+  client     Client          @relation(fields: [clientId], references: [id])
+  bankId     String
+  bank       Bank            @relation(fields: [bankId], references: [id])
+
+  @@map("land_title")
+}
+
+model Loans {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  amount    Int
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id])
+  bankId    String
+  bank      Bank     @relation(fields: [bankId], references: [id])
+
+  @@map("loans")
+}
